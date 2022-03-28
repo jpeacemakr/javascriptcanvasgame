@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <style>
+            body {
+                text-align:center;
+            }
+            canvas {
+                border:1px solid #d3d3d3;
+                background-color: #f1f1f1;
+            }
+            .center {
+                width:600px;
+                margin:auto;
+            }
+            div {
+                text-align:left;
+            }
+        </style>
+
+
+        <script>
+
+            ///////////////////////////////////
+            // about
+            // by James Peacemaker
+            // the game is made up of a matrix of squares like a checkerboard
+            // the game piece can move from one game square to another
+
+
+            ////////////////////////////////////
+            // game variables
+            var gameSquareSize = 20; // size of the game piece and game squares
+            var gameSquareNumber = 30; // number of game squares
+            var gameTotalArea = 600; // total area of the game board (should be gameSquareSize * gameSquareNumber)
+
+
+            ///////////////////////////////
+            // represents each square on the board
+            class GameSquare {
+                // let mySquare = new GameSquare();
+                constructor() {
+                    this.hidden = true;
+                    this.value = 0;
+                }
+                reveal() {
+                    this.hidden = false;
+                }
+            }
+
+            /////////////////////////////////        
+            // start the game. called from body onload()
+            function startGame() {
+                myGameArea.start(gameTotalArea, gameTotalArea);
+                myGamePiece.start(0,0,gameSquareSize,gameSquareSize,"blue");
+
+            }
+
+            //////////////////////////////
+            // object to control the board
+            var myGameArea = {
+                //gameMatrix : [gameSquareNumber],
+                gameMatrix: new Array (gameSquareNumber),
+                canvas : document.createElement("canvas"),
+                start : function(width, height) {
+                    this.canvas.width = width;
+                    this.canvas.height = height;
+                    this.context = this.canvas.getContext("2d");
+                    document.getElementById("canvasDiv").appendChild(this.canvas);
+                    
+                    // create array of arrays
+                    // game square size is 10, so game board has 60 x 60 squares
+                    for(let i=0; i<gameSquareNumber; i++){
+                        this.gameMatrix[i] = new Array (gameSquareNumber);
+                    }
+
+                    // initialize the game squares
+                    for(let i=0; i<gameSquareNumber; i++){
+                        for(let j=0; j<gameSquareNumber; j++){
+                            this.gameMatrix[i][j] = new GameSquare();
+                        }
+                    }
+                    console.log("Debug: " + this.gameMatrix[3][4].value);
+
+                    // set some values for the game squares
+
+
+
+                },
+
+                // render the board again                
+                render : function() {
+                    // clear the canvas
+                    // redraw the board
+
+                    // rendraw the player
+                    myGamePiece.render();
+                },
+
+                // reset the game board and player
+                clear : function() {
+                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    myGamePiece.clear();
+                }
+            }
+
+
+            ///////////////////////////////////
+            // object to control the player's game piece
+            var myGamePiece = {
+                // default position, size and color
+                x : 0,
+                y : 0,
+                width : gameSquareSize,
+                height: gameSquareSize,
+                color : "red",
+                ctx: myGameArea.context,
+
+                // set game piece at start                
+                start : function(x, y, width, height, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.width = width;
+                    this.height = height;
+                    this.color = color;
+                    this.ctx = myGameArea.context;
+                    this.ctx.fillStyle = this.color;
+                    this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                },
+
+                // render the player again                
+                render : function() {
+                    this.ctx.fillStyle = this.color;
+                    this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                },
+
+                // movement functions
+                moveRight : function() {
+                    if (this.x+gameSquareSize<myGameArea.canvas.width){
+                        // clear old position
+                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
+                        this.ctx.fillStyle = this.color;
+                        // draw new position
+                        this.x= this.x + gameSquareSize;
+                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    }
+                },
+                moveLeft : function() {
+                    if (this.x>0){
+                        // clear old position
+                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
+                        this.ctx.fillStyle = this.color;
+                        // draw new position
+                        this.x= this.x - gameSquareSize;
+                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    }
+                },
+                moveUp : function() {
+                    if (this.y>0){
+                        // clear old position
+                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
+                        this.ctx.fillStyle = this.color;
+                        // draw new position
+                        this.y= this.y - gameSquareSize;
+                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    }
+                },
+                moveDown : function() {
+                    if (this.y+gameSquareSize<myGameArea.canvas.height){
+                        // clear old position
+                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
+                        this.ctx.fillStyle = this.color;
+                        // draw new position
+                        this.y= this.y + gameSquareSize;
+                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    }
+                },
+                
+                // reset the player to starting position
+                clear : function() {
+                    this.x = 0;
+                    this.y = 0;
+                    this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+
+            /////////////////////////////////
+            // used to detect keyboard button being pressed. Uses onkeydown() in body tag
+            function keyPressed(event) {
+                if (event.keyCode == 37) {
+                    myGamePiece.moveLeft();
+                    return true;
+                } 
+                else if (event.keyCode == 39) {
+                    myGamePiece.moveRight();
+                    return true;
+                } 
+                else if (event.keyCode == 38) {
+                    myGamePiece.moveUp();
+                    return true;
+                } 
+                else if (event.keyCode == 40) {
+                    myGamePiece.moveDown();
+                    return true;
+                } 
+                else {
+                    return false;
+                }
+            }
+
+
+
+
+        </script>
+
+    </head>
+
+
+    <body onload=" startGame()" onkeydown="return keyPressed(event)">
+
+        <div class="center">
+            <p>Here is some text for the game.</p>
+
+            <!-- The canvas where the game is drawn -->
+            <div id="canvasDiv"></div>
+
+            
+            <!-- The controls -->
+            <div>
+                <p>Click buttons below or use the arrow keys to move.</p>
+                <button onClick="myGamePiece.moveLeft();">MOVE LEFT</button>
+                <button onClick="myGamePiece.moveRight();">MOVE RIGHT</button>
+                <button onClick="myGamePiece.moveUp();">MOVE UP</button>
+                <button onClick="myGamePiece.moveDown();">MOVE DOWN</button>
+                <button onClick="myGameArea.clear();">RESET</button>
+            </div
+        </div>
+    </body>
+</html>
