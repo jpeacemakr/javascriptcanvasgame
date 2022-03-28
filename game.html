@@ -54,24 +54,26 @@
             // start the game. called from body onload()
             function startGame() {
                 myGameArea.start(gameTotalArea, gameTotalArea);
-                myGamePiece.start(0,0,gameSquareSize,gameSquareSize,"blue");
-
+                myGameArea.render();
             }
 
             //////////////////////////////
             // object to control the board
             var myGameArea = {
-                //gameMatrix : [gameSquareNumber],
+                // grid of game piece positions
                 gameMatrix: new Array (gameSquareNumber),
+                
+                // canvas to draw into
                 canvas : document.createElement("canvas"),
+                
+                // initializes the values of the game board then calls function to initialize game piece
                 start : function(width, height) {
                     this.canvas.width = width;
                     this.canvas.height = height;
                     this.context = this.canvas.getContext("2d");
                     document.getElementById("canvasDiv").appendChild(this.canvas);
                     
-                    // create array of arrays
-                    // game square size is 10, so game board has 60 x 60 squares
+                    // turn array into square array of arrays
                     for(let i=0; i<gameSquareNumber; i++){
                         this.gameMatrix[i] = new Array (gameSquareNumber);
                     }
@@ -82,20 +84,46 @@
                             this.gameMatrix[i][j] = new GameSquare();
                         }
                     }
-                    console.log("Debug: " + this.gameMatrix[3][4].value);
+                    // console.log("Debug: " + this.gameMatrix[3][4].value);
 
-                    // set some values for the game squares
-
-
-
+                    //initialize game piece
+                    myGamePiece.start(0,0,gameSquareSize,gameSquareSize,"blue");               
                 },
 
                 // render the board again                
                 render : function() {
+                    console.log("Debug: rendering myGameArea");
                     // clear the canvas
+                    this.context.clearRect(this.x, this.y, this.width, this.height);
                     // redraw the board
+                    // draw grid horizontal lines
+                    for (var i=1; i < gameSquareNumber; i++) {
+                        this.context.moveTo(0, i*gameSquareSize);
+                        this.context.lineTo(this.canvas.width, i*gameSquareSize);
+                        this.context.lineWidth = 1;
+                        this.context.strokeStyle = '#cccccc';
+                        this.context.stroke();
+                    }
+                    // draw grid vertical lines
+                    for (var i=1; i < gameSquareNumber; i++) {
+                        this.context.moveTo(i*gameSquareSize, 0);
+                        this.context.lineTo(i*gameSquareSize, this.canvas.height);
+                        this.context.lineWidth = 1;
+                        this.context.strokeStyle = '#cccccc';
+                        this.context.stroke();
+                    }
 
-                    // rendraw the player
+                    // draw board values
+                    this.context.font = '10pt Helvetica';
+                    this.context.fillStyle = "#000000";
+                    for (var i=0; i < gameSquareNumber; i++) {
+                        for (var j=1; j < gameSquareNumber+1; j++) {
+                            console.log("Debug: drawing text");
+                            this.context.fillText('2', i*gameSquareSize+6, j*gameSquareSize-4);
+                        }
+                    }
+
+                    // redraw the player
                     myGamePiece.render();
                 },
 
@@ -103,6 +131,7 @@
                 clear : function() {
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     myGamePiece.clear();
+                    this.render();
                 }
             }
 
@@ -116,7 +145,7 @@
                 width : gameSquareSize,
                 height: gameSquareSize,
                 color : "red",
-                ctx: myGameArea.context,
+                context: myGameArea.context,
 
                 // set game piece at start                
                 start : function(x, y, width, height, color) {
@@ -125,56 +154,57 @@
                     this.width = width;
                     this.height = height;
                     this.color = color;
-                    this.ctx = myGameArea.context;
-                    this.ctx.fillStyle = this.color;
-                    this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    this.context = myGameArea.context;
+                    this.context.fillStyle = this.color;
+                    this.context.fillRect(this.x, this.y, this.width, this.height);
                 },
 
                 // render the player again                
                 render : function() {
-                    this.ctx.fillStyle = this.color;
-                    this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    console.log("Debug: rendering myGamePiece");
+                    this.context.fillStyle = this.color;
+                    this.context.fillRect(this.x, this.y, this.width, this.height);
                 },
 
                 // movement functions
                 moveRight : function() {
                     if (this.x+gameSquareSize<myGameArea.canvas.width){
                         // clear old position
-                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
-                        this.ctx.fillStyle = this.color;
+                        this.context.clearRect(this.x, this.y, this.width, this.height);
+                        this.context.fillStyle = this.color;
                         // draw new position
                         this.x= this.x + gameSquareSize;
-                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                        this.context.fillRect(this.x, this.y, this.width, this.height);
                     }
                 },
                 moveLeft : function() {
                     if (this.x>0){
                         // clear old position
-                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
-                        this.ctx.fillStyle = this.color;
+                        this.context.clearRect(this.x, this.y, this.width, this.height);
+                        this.context.fillStyle = this.color;
                         // draw new position
                         this.x= this.x - gameSquareSize;
-                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                        this.context.fillRect(this.x, this.y, this.width, this.height);
                     }
                 },
                 moveUp : function() {
                     if (this.y>0){
                         // clear old position
-                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
-                        this.ctx.fillStyle = this.color;
+                        this.context.clearRect(this.x, this.y, this.width, this.height);
+                        this.context.fillStyle = this.color;
                         // draw new position
                         this.y= this.y - gameSquareSize;
-                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                        this.context.fillRect(this.x, this.y, this.width, this.height);
                     }
                 },
                 moveDown : function() {
                     if (this.y+gameSquareSize<myGameArea.canvas.height){
                         // clear old position
-                        this.ctx.clearRect(this.x, this.y, this.width, this.height);
-                        this.ctx.fillStyle = this.color;
+                        this.context.clearRect(this.x, this.y, this.width, this.height);
+                        this.context.fillStyle = this.color;
                         // draw new position
                         this.y= this.y + gameSquareSize;
-                        this.ctx.fillRect(this.x, this.y, this.width, this.height);
+                        this.context.fillRect(this.x, this.y, this.width, this.height);
                     }
                 },
                 
@@ -182,7 +212,6 @@
                 clear : function() {
                     this.x = 0;
                     this.y = 0;
-                    this.ctx.fillRect(this.x, this.y, this.width, this.height);
                 }
             }
 
