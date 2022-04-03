@@ -43,7 +43,7 @@
                 // let mySquare = new GameSquare();
                 constructor() {
                     this.hidden = true;
-                    this.value = 0;
+                    this.value = 1;
                 }
                 reveal() {
                     this.hidden = false;
@@ -89,14 +89,18 @@
                     // console.log("Debug: " + this.gameMatrix[3][4].value);
 
                     //initialize game piece
-                    myGamePiece.start(0,0,gameSquareSize,gameSquareSize,"blue");               
+                    myGamePiece.start(0,0,gameSquareSize,gameSquareSize,"#99CCFF");               
                 },
 
                 // render the board                
                 render : function() {
                     console.log("Debug: rendering myGameArea");
                     // clear the canvas
-                    this.context.clearRect(this.x, this.y, this.width, this.height);
+                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                    // redraw the player
+                    myGamePiece.render();
+
                     // redraw the board
                     // draw grid horizontal lines
                     for (var i=1; i < gameSquareNumber; i++) {
@@ -119,14 +123,15 @@
                     this.context.font = '10pt Helvetica';
                     this.context.fillStyle = "#000000";
                     for (var i=0; i < gameSquareNumber; i++) {
-                        for (var j=1; j < gameSquareNumber+1; j++) {
+                        for (var j=0; j < gameSquareNumber; j++) {
                             console.log("Debug: drawing text");
-                            this.context.fillText('2', i*gameSquareSize+6, j*gameSquareSize-4);
+                            if (this.gameMatrix[i][j].hidden == false){
+                                this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
+                            }
                         }
                     }
 
-                    // redraw the player
-                    myGamePiece.render();
+                    
                 },
 
                 // reset the game board and player
@@ -151,17 +156,12 @@
                 canvasX = canvasX - rect.left;
                 canvasY = canvasY - rect.top;
                 // console.log("Debug: canvas mouse position " + canvasX + " " + canvasY);
-
-                // clear old position
-                myGamePiece.context.clearRect(myGamePiece.x, myGamePiece.y, myGamePiece.width, myGamePiece.height);
-                myGamePiece.context.fillStyle = this.color;
                 
                 // draw new position rounded to the nearest gameSquareSize
                 myGamePiece.x = parseInt(canvasX/gameSquareSize)*gameSquareSize;
                 myGamePiece.y = parseInt(canvasY/gameSquareSize)*gameSquareSize;
 
-                // console.log("Debug: mouse square position " + myGamePiece.x + " " + myGamePiece.y);
-                myGamePiece.context.fillRect(myGamePiece.x, myGamePiece.y, myGamePiece.width, myGamePiece.height);
+                myGameArea.render();
             }
 
 
@@ -198,43 +198,33 @@
                 // movement functions
                 moveRight : function() {
                     if (this.x+gameSquareSize<myGameArea.canvas.width){
-                        // clear old position
-                        this.context.clearRect(this.x, this.y, this.width, this.height);
-                        this.context.fillStyle = this.color;
-                        // draw new position
                         this.x= this.x + gameSquareSize;
-                        this.context.fillRect(this.x, this.y, this.width, this.height);
+                        myGameArea.render();
                     }
                 },
                 moveLeft : function() {
                     if (this.x>0){
-                        // clear old position
-                        this.context.clearRect(this.x, this.y, this.width, this.height);
-                        this.context.fillStyle = this.color;
-                        // draw new position
                         this.x= this.x - gameSquareSize;
-                        this.context.fillRect(this.x, this.y, this.width, this.height);
+                        myGameArea.render();
                     }
                 },
                 moveUp : function() {
                     if (this.y>0){
-                        // clear old position
-                        this.context.clearRect(this.x, this.y, this.width, this.height);
-                        this.context.fillStyle = this.color;
-                        // draw new position
                         this.y= this.y - gameSquareSize;
-                        this.context.fillRect(this.x, this.y, this.width, this.height);
+                        myGameArea.render();
                     }
                 },
                 moveDown : function() {
                     if (this.y+gameSquareSize<myGameArea.canvas.height){
-                        // clear old position
-                        this.context.clearRect(this.x, this.y, this.width, this.height);
-                        this.context.fillStyle = this.color;
-                        // draw new position
                         this.y= this.y + gameSquareSize;
-                        this.context.fillRect(this.x, this.y, this.width, this.height);
+                        myGameArea.render();
                     }
+                },
+
+                // reveals the spot on the map where the gamePiece is located at
+                reveal : function() {
+                    myGameArea.gameMatrix[this.x/gameSquareSize][this.y/gameSquareSize].hidden = 0;
+                    myGameArea.render();
                 },
                 
                 // reset the player to starting position
@@ -269,6 +259,12 @@
             }
 
 
+            ///////////////////////////////
+            // sounds
+            function playBombAudio(){
+                document.getElementById("bombAudio").play();
+            }
+
 
 
         </script>
@@ -278,6 +274,8 @@
 
     <body onload=" startGame()" onkeydown="return keyPressed(event)">
 
+        <audio src="sounds/bomb.m4a" id="bombAudio"></audio>
+   
         <div class="center">
             <p>Here is some text for the game.</p>
 
@@ -292,8 +290,9 @@
                 <button onClick="myGamePiece.moveRight();">MOVE RIGHT</button>
                 <button onClick="myGamePiece.moveUp();">MOVE UP</button>
                 <button onClick="myGamePiece.moveDown();">MOVE DOWN</button>
+                <button onClick="myGamePiece.reveal();playBombAudio();">BOMB</button>
                 <button onClick="myGameArea.clear();">RESET</button>
-            </div
+            </div>
         </div>
     </body>
 </html>
