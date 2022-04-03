@@ -38,8 +38,8 @@
             var gamePieceColor = "#99CCFF";
             var gridColor = "#CCCCCC";
             var backgroundColor = "#CCCCCC";
-            var targetNumber = 5;
-            var victimNumber = 3;
+            var targetNumber = 3;
+            var victimNumber = 5;
 
 
             ///////////////////////////////
@@ -101,7 +101,7 @@
 
                 // render the board                
                 render : function() {
-                    console.log("Debug: rendering myGameArea");
+                    // console.log("Debug: rendering myGameArea");
                     // clear the canvas
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -131,7 +131,6 @@
                     this.context.fillStyle = "#000000";
                     for (var i=0; i < gameSquareNumber; i++) {
                         for (var j=0; j < gameSquareNumber; j++) {
-                            console.log("Debug: drawing text");
                             if (this.gameMatrix[i][j].hidden == false){
                                 this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
                             }
@@ -139,6 +138,19 @@
                     }
 
                     
+                },
+
+
+                // reset the game board and player
+                reveal : function() {
+                    // draw board values
+                    this.context.font = '10pt Helvetica';
+                    this.context.fillStyle = "#000000";
+                    for (var i=0; i < gameSquareNumber; i++) {
+                        for (var j=0; j < gameSquareNumber; j++) {
+                            this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
+                        }
+                    }
                 },
 
                 // reset the game board and player
@@ -176,7 +188,7 @@
 
                 // render the player again                
                 render : function() {
-                    console.log("Debug: rendering myGamePiece");
+                    // console.log("Debug: rendering myGamePiece");
                     this.context.fillStyle = this.color;
                     this.context.fillRect(this.x, this.y, this.width, this.height);
                 },
@@ -229,7 +241,7 @@
                     this.setTarget();
                     this.setVictims();
                 },
-                // render the targets                
+                // render the targets and set the distance in the matrix               
                 setTarget : function() {
 
                     // pick random tile for a target
@@ -242,11 +254,37 @@
                         if (myGameArea.gameMatrix[targetX][targetY].value != 0){
                             myGameArea.gameMatrix[targetX][targetY].value = 0;
                             foundTargets++;
-                            console.log("Debug: target position: " + (targetX+1) + " " + (targetY+1));
-                        }
-                        // set distance values
-                    }
+                            // console.log("Debug: target position: " + (targetX+1) + " " + (targetY+1));
+                            
+                            // set distance values in the gameMaxtrix
+                            //get area to be manipulated
+                            var minX = targetX-4;
+                            var maxX = targetX+4;
+                            // console.log("Debug: X range to expand: " + minX + " " + maxX);
 
+                            var minY = targetY-4;
+                            var maxY = targetY+4;
+                            // console.log("Debug: Y range to expand: " + minY + " " + maxY);
+                        
+                            // make oncentric passes to set distance from target
+                            for (var pass = 1; pass < 5; pass++){
+                                for (var i = minX; i <= maxX; i++){
+                                    for (var j = minY; j <= maxY; j++){
+                                        // console.log("Debug: expanding area: " + i + " " + j);
+                                        if ((i >=0 && i < gameSquareNumber) && (j >=0 && j < gameSquareNumber) && (myGameArea.gameMatrix[i][j].value <= 5)){
+                                            myGameArea.gameMatrix[i][j].value = Math.min(myGameArea.gameMatrix[i][j].value, 5-pass);
+                                        }
+                                    }
+                                }
+                                minX++;
+                                maxX--;
+                                minY++;
+                                maxY--;
+                            }
+                        }
+                    }
+                
+                // render the victims (innocent bystanders) and set distance in the matrix
                 }, setVictims : function() {
                     // pick random tiles for victims
                     // from 0 to gameSquareNumber-1 (0-29)
@@ -259,9 +297,34 @@
                         if ((myGameArea.gameMatrix[targetX][targetY].value != 0) && (myGameArea.gameMatrix[targetX][targetY].value != 9)){
                             myGameArea.gameMatrix[targetX][targetY].value = 9;
                             foundVictims++;
-                            console.log("Debug: victim position: " + (targetX+1) + " " + (targetY+1));
+                            // console.log("Debug: victim position: " + (targetX+1) + " " + (targetY+1));
+                        
+                            // set distance values
+                            //get area to be manipulated
+                            var minX = targetX-4;
+                            var maxX = targetX+4;
+                            // console.log("Debug: X range to expand: " + minX + " " + maxX);
+
+                            var minY = targetY-4;
+                            var maxY = targetY+4;
+                            // console.log("Debug: Y range to expand: " + minY + " " + maxY);
+
+                            // make oncentric passes to set distance from target
+                            for (var pass = 1; pass < 5; pass++){
+                                for (var i = minX; i <= maxX; i++){
+                                    for (var j = minY; j <= maxY; j++){
+                                        // console.log("Debug: expanding area: " + i + " " + j);
+                                        if ((i >=0 && i < gameSquareNumber) && (j >=0 && j < gameSquareNumber) && (myGameArea.gameMatrix[i][j].value <= 5)){
+                                            myGameArea.gameMatrix[i][j].value = Math.min(myGameArea.gameMatrix[i][j].value, 5-pass);
+                                        }
+                                    }
+                                }
+                                minX++;
+                                maxX--;
+                                minY++;
+                                maxY--;
+                            }
                         }
-                        // set distance values
                     }
                 }
             }
@@ -334,7 +397,7 @@
 
     <body onload=" startGame()" onkeydown="return keyPressed(event)">
 
-        <audio src="sounds/bomb.m4a" id="bombAudio"></audio>
+        <audio src="sounds/bomb.mp3" id="bombAudio"></audio>
    
         <div class="center">
             <p>Here is some text for the game.</p>
@@ -351,6 +414,7 @@
                 <button onClick="myGamePiece.moveUp();">MOVE UP</button>
                 <button onClick="myGamePiece.moveDown();">MOVE DOWN</button>
                 <button onClick="myGamePiece.reveal();playBombAudio();">BOMB</button>
+                <button onClick="myGameArea.reveal();">REVEAL</button>
                 <button onClick="myGameArea.clear();">RESET</button>
             </div>
         </div>
