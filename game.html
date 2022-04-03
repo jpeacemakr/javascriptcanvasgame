@@ -35,15 +35,21 @@
             var gameSquareSize = 20; // size of the game piece and game squares
             var gameSquareNumber = 30; // number of game squares
             var gameTotalArea = 600; // total area of the game board (should be gameSquareSize * gameSquareNumber)
+            var gamePieceColor = "#99CCFF";
+            var gridColor = "#CCCCCC";
+            var backgroundColor = "#CCCCCC";
+            var targetNumber = 5;
+            var victimNumber = 3;
 
 
             ///////////////////////////////
             // represents each square on the board
+            // number 1-5 corresponds to distance from target or victim. 0 for target. 9 for victim. 6-8 reserved for future.
             class GameSquare {
                 // let mySquare = new GameSquare();
                 constructor() {
                     this.hidden = true;
-                    this.value = 1;
+                    this.value = 5;
                 }
                 reveal() {
                     this.hidden = false;
@@ -54,6 +60,7 @@
             // start the game. called from body onload()
             function startGame() {
                 myGameArea.start(gameTotalArea, gameTotalArea);
+                myTargets.start();
                 myGameArea.render();
             }
 
@@ -89,7 +96,7 @@
                     // console.log("Debug: " + this.gameMatrix[3][4].value);
 
                     //initialize game piece
-                    myGamePiece.start(0,0,gameSquareSize,gameSquareSize,"#99CCFF");               
+                    myGamePiece.start(0,0,gameSquareSize,gameSquareSize, gamePieceColor);               
                 },
 
                 // render the board                
@@ -107,7 +114,7 @@
                         this.context.moveTo(0, i*gameSquareSize);
                         this.context.lineTo(this.canvas.width, i*gameSquareSize);
                         this.context.lineWidth = 1;
-                        this.context.strokeStyle = '#cccccc';
+                        this.context.strokeStyle = gridColor;
                         this.context.stroke();
                     }
                     // draw grid vertical lines
@@ -115,7 +122,7 @@
                         this.context.moveTo(i*gameSquareSize, 0);
                         this.context.lineTo(i*gameSquareSize, this.canvas.height);
                         this.context.lineWidth = 1;
-                        this.context.strokeStyle = '#cccccc';
+                        this.context.strokeStyle = gridColor;
                         this.context.stroke();
                     }
 
@@ -142,27 +149,6 @@
                 }
             }
 
-            
-            /////////////////////////////////////
-            // sets position of game piece based on mouse click
-            function doMouseDown(event) {
-                // get position of mouse on screen
-                canvasX = event.pageX;
-                canvasY = event.pageY;
-                //console.log("Debug: screen mouse position " + canvasX + " " + canvasY);
-
-                //subtract canvas position from mouse position on screen
-                var rect = myGameArea.canvas.getBoundingClientRect();
-                canvasX = canvasX - rect.left;
-                canvasY = canvasY - rect.top;
-                // console.log("Debug: canvas mouse position " + canvasX + " " + canvasY);
-                
-                // draw new position rounded to the nearest gameSquareSize
-                myGamePiece.x = parseInt(canvasX/gameSquareSize)*gameSquareSize;
-                myGamePiece.y = parseInt(canvasY/gameSquareSize)*gameSquareSize;
-
-                myGameArea.render();
-            }
 
 
             ///////////////////////////////////
@@ -234,6 +220,55 @@
                 }
             }
 
+
+
+            ///////////////////////////////////
+            // object to control the targets
+            var myTargets = {
+                start : function() {
+                    this.setTarget();
+                    this.setVictims();
+                },
+                // render the targets                
+                setTarget : function() {
+
+                    // pick random tile for a target
+                    // from 0 to gameSquareNumber-1 (0-29)
+                    var foundTargets = 0;
+                    while (foundTargets < targetNumber) {
+                        var targetX = Math.floor(Math.random() * gameSquareNumber);
+                        var targetY = Math.floor(Math.random() * gameSquareNumber); 
+                        // if target square is used, pick a new target
+                        if (myGameArea.gameMatrix[targetX][targetY].value != 0){
+                            myGameArea.gameMatrix[targetX][targetY].value = 0;
+                            foundTargets++;
+                            console.log("Debug: target position: " + (targetX+1) + " " + (targetY+1));
+                        }
+                        // set distance values
+                    }
+
+                }, setVictims : function() {
+                    // pick random tiles for victims
+                    // from 0 to gameSquareNumber-1 (0-29)
+                    // if target square is used, pick a new target
+                    var foundVictims = 0;
+                    while (foundVictims < victimNumber) {
+                        var targetX = Math.floor(Math.random() * gameSquareNumber);
+                        var targetY = Math.floor(Math.random() * gameSquareNumber); 
+                        // if victim square is used, pick a new victim
+                        if ((myGameArea.gameMatrix[targetX][targetY].value != 0) && (myGameArea.gameMatrix[targetX][targetY].value != 9)){
+                            myGameArea.gameMatrix[targetX][targetY].value = 9;
+                            foundVictims++;
+                            console.log("Debug: victim position: " + (targetX+1) + " " + (targetY+1));
+                        }
+                        // set distance values
+                    }
+                }
+            }
+
+
+
+
             /////////////////////////////////
             // used to detect keyboard button being pressed. Uses onkeydown() in body tag
             function keyPressed(event) {
@@ -257,6 +292,31 @@
                     return false;
                 }
             }
+
+
+
+            
+            /////////////////////////////////////
+            // sets position of game piece based on mouse click
+            function doMouseDown(event) {
+                // get position of mouse on screen
+                canvasX = event.pageX;
+                canvasY = event.pageY;
+                //console.log("Debug: screen mouse position " + canvasX + " " + canvasY);
+
+                //subtract canvas position from mouse position on screen
+                var rect = myGameArea.canvas.getBoundingClientRect();
+                canvasX = canvasX - rect.left;
+                canvasY = canvasY - rect.top;
+                // console.log("Debug: canvas mouse position " + canvasX + " " + canvasY);
+                
+                // draw new position rounded to the nearest gameSquareSize
+                myGamePiece.x = parseInt(canvasX/gameSquareSize)*gameSquareSize;
+                myGamePiece.y = parseInt(canvasY/gameSquareSize)*gameSquareSize;
+
+                myGameArea.render();
+            }
+
 
 
             ///////////////////////////////
