@@ -63,6 +63,7 @@
                 myGameArea.start(gameTotalArea, gameTotalArea);
                 myTargets.start();
                 myGameArea.render();
+                myScore.start();
             }
 
             //////////////////////////////
@@ -229,10 +230,20 @@
                     }
                 },
 
-                // reveals the spot on the map where the gamePiece is located at
+                // this is the bomb function. it reveals the spot on the map where the gamePiece is located
                 reveal : function() {
                     myGameArea.gameMatrix[this.x/gameSquareSize][this.y/gameSquareSize].hidden = 0;
                     myGameArea.render();
+                    playBombAudio();
+                    bombImage();
+                    if (myGameArea.gameMatrix[this.x/gameSquareSize][this.y/gameSquareSize].value == 0) {
+                        myScore.update(1000);
+                    } else if (myGameArea.gameMatrix[this.x/gameSquareSize][this.y/gameSquareSize].value == 9) {
+                        myScore.update(-100);
+                    } 
+                    else {
+                        myScore.update(-10);
+                    }
                 },
                 
                 // reset the player to starting position
@@ -361,6 +372,10 @@
                     myGamePiece.moveDown();
                     return true;
                 } 
+                else if (event.keyCode == 66) {
+                    myGamePiece.reveal();
+                    return true;
+                } 
                 else {
                     return false;
                 }
@@ -419,8 +434,25 @@
             }
 
 
-        </script>
 
+            ////////////////////////////////////////////
+            // score
+            var myScore = {
+                gameScore : 0,
+                
+                // set score at start                
+                start : function() {
+                    document.getElementById("score").innerHTML = "Score: " + this.gameScore;
+                },
+                // update score by amount change
+                update : function(change) {
+                    this.gameScore = this.gameScore + change;
+                    document.getElementById("score").innerHTML = "Score: " + this.gameScore;
+                }
+            }
+            
+
+        </script>
     </head>
 
 
@@ -430,6 +462,7 @@
    
         <div class="center">
             <p>Here is some text for the game.</p>
+            <p id="score"></p>
 
             <!-- The canvas where the game is drawn -->
             <div id="canvasDiv"></div>
@@ -442,10 +475,14 @@
                 <button onClick="myGamePiece.moveRight();">MOVE RIGHT</button>
                 <button onClick="myGamePiece.moveUp();">MOVE UP</button>
                 <button onClick="myGamePiece.moveDown();">MOVE DOWN</button>
-                <button onClick="myGamePiece.reveal();playBombAudio();bombImage();">BOMB</button>
+                <button onClick="myGamePiece.reveal();">BOMB</button>
                 <button onClick="myGameArea.reveal();">REVEAL</button>
                 <button onClick="myGameArea.clear();">RESET</button>
             </div>
         </div>
     </body>
 </html>
+
+
+
+
