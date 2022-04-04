@@ -35,9 +35,10 @@
             var gameSquareSize = 20; // size of the game piece and game squares
             var gameSquareNumber = 30; // number of game squares
             var gameTotalArea = 600; // total area of the game board (should be gameSquareSize * gameSquareNumber)
-            var gamePieceColor = "#99CCFF";
-            var gridColor = "#CCCCCC";
-            var backgroundColor = "#CCCCCC";
+            var gamePieceColor = "#BBDDFF";
+            var gridColor = "#6699CC";
+            var backgroundColor1 = "#99CCFF"; // inside of radial blend
+            var backgroundColor2 = "#6699CC"; // outside of radial blend
             var targetNumber = 3;
             var victimNumber = 5;
 
@@ -103,26 +104,35 @@
                 render : function() {
                     // console.log("Debug: rendering myGameArea");
                     // clear the canvas
-                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    //this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                    // Create gradient
+                    var bgGradient = this.context.createRadialGradient(300, 300, 5, 300, 300, 500);
+                    bgGradient.addColorStop(0, backgroundColor1);
+                    bgGradient.addColorStop(1, backgroundColor2);
+
+                    // Fill with gradient
+                    this.context.fillStyle = bgGradient;
+                    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
                     // redraw the player
                     myGamePiece.render();
 
                     // redraw the board
+                    // set grid style
+                    this.context.lineWidth = 1;
+                    this.context.strokeStyle = gridColor; 
+                    
                     // draw grid horizontal lines
                     for (var i=1; i < gameSquareNumber; i++) {
                         this.context.moveTo(0, i*gameSquareSize);
                         this.context.lineTo(this.canvas.width, i*gameSquareSize);
-                        this.context.lineWidth = 1;
-                        this.context.strokeStyle = gridColor;
                         this.context.stroke();
                     }
                     // draw grid vertical lines
                     for (var i=1; i < gameSquareNumber; i++) {
                         this.context.moveTo(i*gameSquareSize, 0);
                         this.context.lineTo(i*gameSquareSize, this.canvas.height);
-                        this.context.lineWidth = 1;
-                        this.context.strokeStyle = gridColor;
                         this.context.stroke();
                     }
 
@@ -389,6 +399,25 @@
             }
 
 
+            // sleep function
+            let sleep = milliseconds => {  
+                return new Promise(resolve => setTimeout(resolve, milliseconds));  
+            };  
+
+
+            ////////////////////////////////////
+            // images
+            function bombImage(){
+                const img = new Image();        
+                img.src = './images/bomb.jpg';        
+                img.onload = () => {          
+                    myGameArea.context.drawImage(img, myGamePiece.x, myGamePiece.y);        
+                };
+                sleep(1000).then(() => {  
+                    myGameArea.render();
+                });  
+            }
+
 
         </script>
 
@@ -413,7 +442,7 @@
                 <button onClick="myGamePiece.moveRight();">MOVE RIGHT</button>
                 <button onClick="myGamePiece.moveUp();">MOVE UP</button>
                 <button onClick="myGamePiece.moveDown();">MOVE DOWN</button>
-                <button onClick="myGamePiece.reveal();playBombAudio();">BOMB</button>
+                <button onClick="myGamePiece.reveal();playBombAudio();bombImage();">BOMB</button>
                 <button onClick="myGameArea.reveal();">REVEAL</button>
                 <button onClick="myGameArea.clear();">RESET</button>
             </div>
