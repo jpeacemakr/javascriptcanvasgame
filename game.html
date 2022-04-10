@@ -6,9 +6,10 @@
         <style>
             body {
                 text-align:center;
+                background-image: url('images/waves.svg');
             }
             canvas {
-                border:1px solid #d3d3d3;
+                border:0px solid #d3d3d3;
                 background-color: #f1f1f1;
             }
             .center {
@@ -17,6 +18,9 @@
             }
             div {
                 text-align:left;
+            }
+            * {
+                box-sizing:border-box;
             }
         </style>
 
@@ -98,7 +102,7 @@
                     // console.log("Debug: " + this.gameMatrix[3][4].value);
 
                     //initialize game piece
-                    myGamePiece.start(0,0,gameSquareSize,gameSquareSize, gamePieceColor);               
+                    myGamePiece.start(15,14,gameSquareSize,gameSquareSize, gamePieceColor);               
                 },
 
                 // render the board                
@@ -187,8 +191,8 @@
 
                 // set game piece at start                
                 start : function(x, y, width, height, color) {
-                    this.x = x;
-                    this.y = y;
+                    this.x = x*gameSquareSize;
+                    this.y = y*gameSquareSize;
                     this.width = width;
                     this.height = height;
                     this.color = color;
@@ -200,8 +204,14 @@
                 // render the player again                
                 render : function() {
                     // console.log("Debug: rendering myGamePiece");
-                    this.context.fillStyle = this.color;
-                    this.context.fillRect(this.x, this.y, this.width, this.height);
+                    //this.context.fillStyle = this.color;
+                    //this.context.fillRect(this.x, this.y, this.width, this.height);
+
+                    const imgCrosshair = new Image();        
+                    imgCrosshair.src = './images/crosshair.svg';        
+                    imgCrosshair.onload = () => {          
+                        myGameArea.context.drawImage(imgCrosshair, this.x-80, this.y-80);        
+                    };
                 },
 
                 // movement functions
@@ -460,25 +470,32 @@
 
         <audio src="sounds/bomb.mp3" id="bombAudio"></audio>
    
-        <div class="center">
-            <p>Here is some text for the game.</p>
-            <p id="score"></p>
+        <div class="center" style="width:1000px">
+            <h1>Paper submarine</h1>
+            <div style="float:left; width:400px; background-color:#ffffff; padding:20px; height:600px; ";>
+                <p id="score"></p>
+                <p>Sink the enemy submarines without hitting innocent bystanders.</p>
+                <p>Sonar numbers show how far a target is away from each shot.</p>
 
-            <!-- The canvas where the game is drawn -->
-            <div id="canvasDiv"></div>
-
-            
-            <!-- The controls -->
-            <div>
-                <p>Click buttons below or use the arrow keys to move.</p>
+                <!-- The controls -->
+                <p>Click buttons below or use the arrow keys to move the target.</p>
+                <p>Scoring: </p>
+                <ul>
+                    <li>+1,000: Hitting an enemy submarine</li>
+                    <li>-100: Hitting an innocent bystander</li>
+                    <li>-10: Missing a shot with a torpedo</li>
+                </ul>
+                <button onClick="myGamePiece.moveUp();">MOVE UP</button><br>
                 <button onClick="myGamePiece.moveLeft();">MOVE LEFT</button>
-                <button onClick="myGamePiece.moveRight();">MOVE RIGHT</button>
-                <button onClick="myGamePiece.moveUp();">MOVE UP</button>
-                <button onClick="myGamePiece.moveDown();">MOVE DOWN</button>
+                <button onClick="myGamePiece.moveRight();">MOVE RIGHT</button><br>
+                <button onClick="myGamePiece.moveDown();">MOVE DOWN</button><br>
                 <button onClick="myGamePiece.reveal();">BOMB</button>
                 <button onClick="myGameArea.reveal();">REVEAL</button>
                 <button onClick="myGameArea.clear();">RESET</button>
             </div>
+            <!-- The canvas where the game is drawn -->
+            <div id="canvasDiv" style="float:left;"></div>
+            
         </div>
     </body>
 </html>
