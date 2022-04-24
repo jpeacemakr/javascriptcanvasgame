@@ -47,6 +47,7 @@
                 width: 1000px;
                 font-size:12px;
             }
+
             * {
                 box-sizing:border-box;
             }
@@ -65,11 +66,9 @@
 
             ////////////////////////////////////
             // game initialization variables
-            var gameSquareSize = 20; // size of the game piece and game squares
-            // var gameSquareNumber = 30; // number of game squares
+            var gameSquareSize = 20; // size of the game piece and game squares in pixels
             var gameSquareNumberX = 30; // number of X game squares (width)
             var gameSquareNumberY = 30; // number of Y game squares (height)
-            var gameTotalArea = 600; // total area of the game board (should be gameSquareSize * gameSquareNumber)
             // var gamePieceColor = "#BBDDFF";
             var gridColor = "#6699CC";
             // var backgroundColor1 = "#99CCFF"; // inside of radial blend
@@ -78,14 +77,13 @@
             var victimNumber = 5;
 
 
-
             /////////////////////////////////        
             // start the game. called from body onload()
             function startGame() {
+                myScore.start();
                 myGameArea.start();
                 myTargets.start();
                 myGameArea.render();
-                myScore.start();
             }
 
 
@@ -205,7 +203,6 @@
                     }
                 },
 
-
                 // reveal the values on the game board (used for debugging and cheating)
                 reveal : function() {
                     // draw board values
@@ -302,13 +299,16 @@
                   
                     // check if anything was hit and update score and targets left
                     if (myGameArea.gameMatrix[this.x][this.y].value == 0) {
-                        targetNumber--;
+                        myTargets.targetRemaining--;
                         myScore.update(1000);
                         await sleep(1000).then(() => {  
                             myGameArea.render();
-                        });  
+                        });
+                        if (myTargets.targetRemaining == 0) {
+                            myScore.finish();
+                        }  
                     } else if (myGameArea.gameMatrix[this.x][this.y].value == 9) {
-                        victimNumber--;
+                        myTargets.victimRemaining--;
                         myScore.update(-100);
                         await sleep(1000).then(() => {  
                             myGameArea.render();
@@ -335,7 +335,13 @@
             ///////////////////////////////////
             // object to initialize the targets and set distance values on the game board.
             var myTargets = {
+
+                targetRemaining : targetNumber,
+                victimRemaining : victimNumber,
+
                 start : function() {
+                    this.targetRemaining = targetNumber;
+                    this.victimRemaining = victimNumber;
                     this.setTarget();
                     this.setVictims();
                 },
@@ -429,6 +435,69 @@
             }
 
 
+            
+            ////////////////////////////////////////////
+            // object to control the scoreboard
+            var myScore = {
+                gameScore : 0,
+                title : "Noob",
+                
+                // set score at start                
+                start : function() {
+                    this.gameScore = 0;
+                    this.title = "Noob";
+                    document.getElementById("score").innerHTML = 
+                    "<p>Score: " + this.gameScore + "<p>" + 
+                    "<p>Submarines left: " + myTargets.targetRemaining + "<p>" + 
+                    "<p>Title: " + this.title + "</p>" 
+                    ;
+                },
+
+                // update score and title by amount change
+                update : function(change) {
+                    this.gameScore = this.gameScore + change;
+                    if (this.gameScore > 2500){
+                        this.title = "Hero";
+                    } else if (this.gameScore > 2200) {
+                        this.title = "Sharpshooter";
+                    } else if (this.gameScore > 1500) {
+                        this.title = "Warrior";
+                    } else if (this.gameScore > 800) {
+                        this.title = "Completely adequate";
+                    } else if (this.gameScore > 500) {
+                        this.title = "Indiscriminate killer";
+                    } else if (this.gameScore > 0) {
+                        this.title = "Buffoon";
+                    } else if (this.gameScore > -100) {
+                        this.title = "Jinxed";
+                    } else if (this.gameScore > -250) {
+                        this.title = "Scourge of the sea";
+                    } else if (this.gameScore > -500) {
+                        this.title = "Eco-terrorist";
+                    } else {
+                        this.title = "War criminal";
+                    }
+                    document.getElementById("score").innerHTML = 
+                    "<p>Score: " + this.gameScore + "<p>" + 
+                    "<p>Targets left: " + myTargets.targetRemaining + "<p>" +
+                    "<p>Title: " + this.title + "</p>" 
+                    ;
+                }, 
+                
+                finish : function() {
+                    // show splash screen
+
+
+                    // update cookie with score
+
+
+                    // reset the game
+                    startGame();
+                }
+            }
+
+
+
             /////////////////////////////////
             // used to detect keyboard button being pressed. Uses onkeydown() in body tag
             function keyPressed(event) {
@@ -482,22 +551,41 @@
             }
 
 
-
-            ///////////////////////////////
-            // sounds
-            function playBombAudio(){
-                document.getElementById("bombAudio").play();
-            }
-
-
             // sleep function
             let sleep = milliseconds => {  
                 return new Promise(resolve => setTimeout(resolve, milliseconds));  
             };  
 
 
+            ///////////////////////////////
+            // sounds
+
+            // sound when torpedo is fired
+            function playBombAudio(){
+                document.getElementById("bombAudio").play();
+            }
+
+            // sound when submarine is hit
+            function playBombAudio(){
+                document.getElementById("bombAudio").play();
+            }
+
+            // sound when whale is hit
+            function playBombAudio(){
+                document.getElementById("bombAudio").play();
+            }
+
+            // sound when game is over
+            function playBombAudio(){
+                document.getElementById("bombAudio").play();
+            }
+            
+
+
             ////////////////////////////////////
             // images
+
+            // small explosion image
             function bombImage(){
                 const img = new Image();        
                 img.src = './images/bomb.jpg';        
@@ -506,7 +594,25 @@
                 };
             }
 
+            // small submarine image
+            function submarineImage(){
+                const img = new Image();        
+                img.src = './images/bomb.jpg';        
+                img.onload = () => {          
+                    myGameArea.context.drawImage(img, myGamePiece.x*gameSquareSize, myGamePiece.y*gameSquareSize);        
+                };
+            }
+            
+            // small whale image
+            function whaleImage(){
+                const img = new Image();        
+                img.src = './images/bomb.jpg';        
+                img.onload = () => {          
+                    myGameArea.context.drawImage(img, myGamePiece.x*gameSquareSize, myGamePiece.y*gameSquareSize);        
+                };
+            }
 
+            // whale hit by torpedo splash screen image
             function splashWhale(){
                 const img = new Image();        
                 img.src = './images/whaleshot.svg';        
@@ -515,55 +621,23 @@
                 };
             }
 
-
-
-            ////////////////////////////////////////////
-            // score
-            var myScore = {
-                gameScore : 0,
-                title : "Noob",
-                
-                // set score at start                
-                start : function() {
-                    document.getElementById("score").innerHTML = 
-                    "<p>Score: " + this.gameScore + "<p>" + 
-                    "<p>Submarines left: " + targetNumber + "<p>" + 
-                    "<p>Title: " + this.title + "</p>" 
-                    ;
-                },
-
-                // update score and title by amount change
-                update : function(change) {
-                    this.gameScore = this.gameScore + change;
-                    if (this.gameScore > 2500){
-                        this.title = "Hero";
-                    } else if (this.gameScore > 2200) {
-                        this.title = "Sharpshooter";
-                    } else if (this.gameScore > 1500) {
-                        this.title = "Warrior";
-                    } else if (this.gameScore > 800) {
-                        this.title = "Completely adequate";
-                    } else if (this.gameScore > 500) {
-                        this.title = "Indiscriminate killer";
-                    } else if (this.gameScore > 0) {
-                        this.title = "Buffoon";
-                    } else if (this.gameScore > -100) {
-                        this.title = "Jinxed";
-                    } else if (this.gameScore > -250) {
-                        this.title = "Scourge of the sea";
-                    } else if (this.gameScore > -500) {
-                        this.title = "Eco-terrorist";
-                    } else {
-                        this.title = "War criminal";
-                    }
-                    document.getElementById("score").innerHTML = 
-                    "<p>Score: " + this.gameScore + "<p>" + 
-                    "<p>Targets left: " + targetNumber + "<p>" +
-                    "<p>Title: " + this.title + "</p>" 
-                    ;
-                }
+            // submarine hit by torpedo splash screen image
+            function splashSubmarine(){
+                const img = new Image();        
+                img.src = './images/whaleshot.svg';        
+                img.onload = () => {          
+                    myGameArea.context.drawImage(img, 0, 0);
+                };
             }
-            
+
+            // splash screen image when all submarines have been destroyed
+            function splashWin(){
+                const img = new Image();        
+                img.src = './images/whaleshot.svg';        
+                img.onload = () => {          
+                    myGameArea.context.drawImage(img, 0, 0);
+                };
+            }
 
         </script>
     </head>
@@ -606,7 +680,7 @@
                     <button onClick="myGamePiece.moveDown();">MOVE DOWN</button><br>
                     <button onClick="myGamePiece.reveal();">BOMB</button>
                     <button onClick="myGameArea.reveal();">REVEAL</button>
-                    <button onClick="myGameArea.clear();">RESET</button>
+                    <button onClick="startGame();">RESET</button>
                 </div>
                 <!-- The canvas where the game is drawn -->
                 <div id="canvasDiv"></div>
