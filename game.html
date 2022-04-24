@@ -206,7 +206,7 @@
                 },
 
 
-                // reset the game board and player
+                // reveal the values on the game board (used for debugging and cheating)
                 reveal : function() {
                     // draw board values
                     this.context.font = '10pt Helvetica';
@@ -234,6 +234,7 @@
                 // default position, size and color
                 x : 0,
                 y : 0,
+                // these values can be used for a fill-type player instead of an image-type player.
                 // width : gameSquareSize,
                 // height: gameSquareSize,
                 // color : "red",
@@ -290,22 +291,35 @@
                     }
                 },
 
-                // this is the bomb function. it reveals the spot on the map where the gamePiece is located
-                reveal : function() {
+                // This is the bomb function. it reveals the spot on the map where the gamePiece is located.
+                // It shows a bomb image in the location and then clears it one second later.
+                // It then displays a splash screen (submarine or whale) if something was hit.
+                reveal : async function() {
                     myGameArea.gameMatrix[this.x][this.y].hidden = 0;
                     myGameArea.render();
                     playBombAudio();
                     bombImage();
+                  
                     // check if anything was hit and update score and targets left
                     if (myGameArea.gameMatrix[this.x][this.y].value == 0) {
                         targetNumber--;
                         myScore.update(1000);
+                        await sleep(1000).then(() => {  
+                            myGameArea.render();
+                        });  
                     } else if (myGameArea.gameMatrix[this.x][this.y].value == 9) {
                         victimNumber--;
                         myScore.update(-100);
+                        await sleep(1000).then(() => {  
+                            myGameArea.render();
+                        });  
+                        splashWhale();
                     } 
                     else {
                         myScore.update(-10);
+                        await sleep(1000).then(() => {  
+                            myGameArea.render();
+                        });  
                     }
                 },
                 
@@ -319,13 +333,14 @@
 
 
             ///////////////////////////////////
-            // object to control the targets
+            // object to initialize the targets and set distance values on the game board.
             var myTargets = {
                 start : function() {
                     this.setTarget();
                     this.setVictims();
                 },
-                // render the targets and set the distance in the matrix               
+                
+                // create the targets and set the distance values in the game matrix               
                 setTarget : function() {
 
                     // pick random tile for a target
@@ -368,7 +383,7 @@
                         }
                     }
                 
-                // render the victims (innocent bystanders) and set distance in the matrix
+                // create the victims (innocent bystanders) and set distance values in the game matrix
                 }, setVictims : function() {
                     // pick random tiles for victims
                     // from 0 to gameSquareNumber-1 (0-29)
@@ -412,8 +427,6 @@
                     }
                 }
             }
-
-
 
 
             /////////////////////////////////
@@ -491,9 +504,15 @@
                 img.onload = () => {          
                     myGameArea.context.drawImage(img, myGamePiece.x*gameSquareSize, myGamePiece.y*gameSquareSize);        
                 };
-                sleep(1000).then(() => {  
-                    myGameArea.render();
-                });  
+            }
+
+
+            function splashWhale(){
+                const img = new Image();        
+                img.src = './images/whaleshot.svg';        
+                img.onload = () => {          
+                    myGameArea.context.drawImage(img, 0, 0);
+                };
             }
 
 
@@ -512,7 +531,8 @@
                     "<p>Title: " + this.title + "</p>" 
                     ;
                 },
-                // update score by amount change
+
+                // update score and title by amount change
                 update : function(change) {
                     this.gameScore = this.gameScore + change;
                     if (this.gameScore > 2500){
@@ -529,7 +549,7 @@
                         this.title = "Buffoon";
                     } else if (this.gameScore > -100) {
                         this.title = "Jinxed";
-                    } else if (this.gameScore > -200) {
+                    } else if (this.gameScore > -250) {
                         this.title = "Scourge of the sea";
                     } else if (this.gameScore > -500) {
                         this.title = "Eco-terrorist";
@@ -540,7 +560,6 @@
                     "<p>Score: " + this.gameScore + "<p>" + 
                     "<p>Targets left: " + targetNumber + "<p>" +
                     "<p>Title: " + this.title + "</p>" 
-
                     ;
                 }
             }
@@ -558,7 +577,7 @@
             <div class="header">
                 <!-- Header -->
                 <image src="images/periscopecropped.svg" style="width:120px;float:left; margin-left:20px; margin-right:20px" alt="persicope">
-                <h1 style="position:absolute; margin-left:165px; margin-top:10px; font-size: 58px; text-shadow: 1px 1px 2px black;"><span style="color:white">submarine</span"><span style="color:#bedfff ">sweeper</span></h1>
+                <h1 style="position:absolute; margin-left:165px; margin-top:10px; font-size: 58px; text-shadow: 1px 1px 2px black;"><span style="color:white">Don't torpedo the </span"><span style="color:#bedfff ">whales!</span></h1>
                 <p style="font-family: Georgia; position:absolute; margin-left:170px; margin-top:75px; font-size: 15px; color:#4e7dad"><i>(An absurd game of luck and logic)</i></p>
             </div>
             </image><div class="center">
@@ -566,15 +585,15 @@
                 <div class ="words">
 
                     <p><b>Objective:</b> </p>
-                    <p>Sink the 3 enemy submarines without hitting the 5 innocent bystanders.
-                    Sonar numbers (1-4) show how far a target is away from each shot.</p>
+                    <p>You are a submarine captain. Your mission is to sink the 3 enemy submarines without hitting the 5 innocent whales.
+                    You can't see in the murky water, but sonar numbers (1-4) show how far a target is away from each shot after it is fired.</p>
 
                     <!-- The controls -->
                     <p>Click buttons below or use the arrow keys to move the target.</p>
                     <p><b>Scoring:</b> </p>
                     <ul>
                         <li>+1,000: Hitting an enemy submarine</li>
-                        <li>-100: Hitting an innocent bystander</li>
+                        <li>-100: Hitting a poor defenseless whale</li>
                         <li>-10: Missing a shot with a torpedo</li>
                     </ul>
 
