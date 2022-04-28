@@ -404,34 +404,36 @@
         // It shows a bomb image in the location and then clears it one second later.
         // It then displays a splash screen (submarine or whale) if something was hit.
         reveal : async function() {
-            myGameArea.gameMatrix[this.x][this.y].hidden = 0;
-            myGameArea.render();
-            playBombAudio();
-            bombImage();
-          
-            // check if anything was hit and update score and targets left
-            if (myGameArea.gameMatrix[this.x][this.y].value == 0) {
-                myTargets.targetRemaining--;
-                myScore.update(1000);
-                await sleep(1000).then(() => {  
-                    myGameArea.render();
-                });
-                if (myTargets.targetRemaining == 0) {
-                    myScore.finish();
-                }  
-            } else if (myGameArea.gameMatrix[this.x][this.y].value == 9) {
-                myTargets.victimRemaining--;
-                myScore.update(-100);
-                await sleep(1000).then(() => {  
-                    myGameArea.render();
-                });  
-                splashWhale();
-            } 
-            else {
-                myScore.update(-10);
-                await sleep(1000).then(() => {  
-                    myGameArea.render();
-                });  
+            if (myGameArea.gameMatrix[this.x][this.y].hidden == 1) { 
+                myGameArea.gameMatrix[this.x][this.y].hidden = 0;
+                myGameArea.render();
+                playBombAudio();
+                bombImage();
+            
+                // check if anything was hit and update score and targets left
+                if (myGameArea.gameMatrix[this.x][this.y].value == 0) {
+                    myTargets.targetRemaining--;
+                    myScore.update(1000);
+                    await sleep(1000).then(() => {  
+                        myGameArea.render();
+                    });
+                    if (myTargets.targetRemaining == 0) {
+                        myScore.finish();
+                    }  
+                } else if (myGameArea.gameMatrix[this.x][this.y].value == 9) {
+                    myTargets.victimRemaining--;
+                    myScore.update(-100);
+                    await sleep(1000).then(() => {  
+                        myGameArea.render();
+                    });  
+                    splashWhale();
+                } 
+                else {
+                    myScore.update(-10);
+                    await sleep(1000).then(() => {  
+                        myGameArea.render();
+                    });  
+                }
             }
         },
         
