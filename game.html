@@ -71,6 +71,18 @@
                 font-size:12px;
             }
 
+
+            .image-swap {
+                cursor: pointer;
+            }
+            .image-swap>img, .image-swap:active>img:first-child {
+                display: none;
+            }
+            .image-swap>img:first-child, .image-swap:active>img:last-child {
+                display: block;
+            }
+
+
             * {
                 box-sizing:border-box;
             }
@@ -115,13 +127,18 @@
                     <!-- Uses script to display the score, targets left -->
                     <h3 id="score"></h3>
 
-                    <button onClick="myGamePiece.moveUp();">MOVE UP</button><br>
-                    <button onClick="myGamePiece.moveLeft();">MOVE LEFT</button>
-                    <button onClick="myGamePiece.moveRight();">MOVE RIGHT</button><br>
-                    <button onClick="myGamePiece.moveDown();">MOVE DOWN</button><br>
+                    <button onClick="myGamePiece.moveUp();">UP</button>
+                    <button onClick="myGamePiece.moveLeft();">LEFT</button>
+                    <button onClick="myGamePiece.moveRight();">RIGHT</button>
+                    <button onClick="myGamePiece.moveDown();">DOWN</button>
                     <button onClick="myGamePiece.reveal();">BOMB</button>
                     <button onClick="myGameArea.reveal();">REVEAL</button>
                     <button onClick="startGame();">RESET</button>
+                    <div class="image-swap"  onClick="myGamePiece.reveal();">
+                        <img src="images/button.svg" style="width: 100px"/>
+                        <img src="images/buttonpushed.svg" style="width: 100px"/>
+                    </div>
+
                 </div>
                 <!-- The canvas where the game is drawn -->
                 <div id="canvasDiv"></div>
