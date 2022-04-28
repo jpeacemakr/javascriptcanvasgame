@@ -290,26 +290,36 @@
             for (var i=0; i < gameSquareNumberX; i++) {
                 for (var j=0; j < gameSquareNumberY; j++) {
                     if (this.gameMatrix[i][j].hidden == false){
-                        // fill square color
                         if (this.gameMatrix[i][j].value == 1){
                             this.context.fillStyle = "red";
+                            this.context.fillRect(i*gameSquareSize, j*gameSquareSize, gameSquareSize, gameSquareSize);
+                            this.context.fillStyle = "black";
+                            this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
                         } else if (this.gameMatrix[i][j].value == 2){
                             this.context.fillStyle = "orange";
+                            this.context.fillRect(i*gameSquareSize, j*gameSquareSize, gameSquareSize, gameSquareSize);
+                            this.context.fillStyle = "black";
+                            this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
                         } else if (this.gameMatrix[i][j].value == 3){
                             this.context.fillStyle = "yellow";
+                            this.context.fillRect(i*gameSquareSize, j*gameSquareSize, gameSquareSize, gameSquareSize);
+                            this.context.fillStyle = "black";
+                            this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
                         } else if (this.gameMatrix[i][j].value == 4){
                             this.context.fillStyle = "lime";
+                            this.context.fillRect(i*gameSquareSize, j*gameSquareSize, gameSquareSize, gameSquareSize);
+                            this.context.fillStyle = "black";
+                            this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
                         } else if (this.gameMatrix[i][j].value == 0){
                             this.context.fillStyle = "white";
+                            postImage("./images/deadsubicon.jpg", i*gameSquareSize, j*gameSquareSize);
                         } else if (this.gameMatrix[i][j].value == 9){
                             this.context.fillStyle = "purple";
+                            postImage("./images/deadwhaleicon.jpg", i*gameSquareSize, j*gameSquareSize);
                         } else {
-                            this.context.fillStyle = "lightblue";
+                            this.context.fillStyle = "#bbddff";
+                            this.context.fillRect(i*gameSquareSize, j*gameSquareSize, gameSquareSize, gameSquareSize);
                         }
-                        this.context.fillRect(i*gameSquareSize, j*gameSquareSize, gameSquareSize, gameSquareSize);
-                        // show square value
-                        this.context.fillStyle = "black";
-                        this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
                     }
                 }
             }
@@ -408,7 +418,7 @@
                 myGameArea.gameMatrix[this.x][this.y].hidden = 0;
                 myGameArea.render();
                 playBombAudio();
-                bombImage();
+                postImage("./images/bomb.jpg", myGamePiece.x*gameSquareSize, myGamePiece.y*gameSquareSize);
             
                 // check if anything was hit and update score and targets left
                 if (myGameArea.gameMatrix[this.x][this.y].value == 0) {
@@ -701,30 +711,13 @@
     ////////////////////////////////////
     // images
 
-    // small explosion image
-    function bombImage(){
-        const img = new Image();        
-        img.src = './images/bomb.jpg';        
-        img.onload = () => {          
-            myGameArea.context.drawImage(img, myGamePiece.x*gameSquareSize, myGamePiece.y*gameSquareSize);        
-        };
-    }
 
-    // small submarine image
-    function submarineImage(){
+    // post a photo at location x,y
+    function postImage(fileName, x, y){
         const img = new Image();        
-        img.src = './images/bomb.jpg';        
+        img.src = fileName;        
         img.onload = () => {          
-            myGameArea.context.drawImage(img, myGamePiece.x*gameSquareSize, myGamePiece.y*gameSquareSize);        
-        };
-    }
-    
-    // small whale image
-    function whaleImage(){
-        const img = new Image();        
-        img.src = './images/bomb.jpg';        
-        img.onload = () => {          
-            myGameArea.context.drawImage(img, myGamePiece.x*gameSquareSize, myGamePiece.y*gameSquareSize);        
+            myGameArea.context.drawImage(img, x, y);        
         };
     }
 
