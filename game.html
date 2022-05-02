@@ -14,7 +14,7 @@
             }
 
             canvas {
-                background-image: radial-gradient(#99CCFF, #77AADD);
+                background-image: radial-gradient(#BBDDFF, #77AADD);
                 display: block;
             }
             
@@ -38,28 +38,27 @@
             .words {
                 text-align:left;
                 background-color:#ffffff; 
-                padding:20px; 
+                padding: 8px 20px 20px 20px; 
             }
             #canvasDiv {
             }
 
             #win {
                 position: absolute;
-                background-color:#ffffff;
                 width: 800px;
                 height:400px;
                 z-index: 1;
             }
 
             .winShow {
-                top: 200px;
+                top: 10px;
                 left:calc(50% - 400px); 
                 transition: top 2s;
                 transition-timing-function: ease;
             }
 
             .winHide {
-                top: -400px;
+                top: -800px;
                 left:calc(50% - 400px); 
                 transition: top 4s;
                 transition-timing-function: ease;
@@ -112,20 +111,19 @@
         <audio src="sounds/bomb.mp3" id="bombAudio"></audio>
    
         <div id="win" class="winHide">
-            <h1>You win!</h1>
+            <img src="images/sky.svg">
         </div>
 
         <div class = "page">
             <div class="header">
                 <!-- Header -->
                 <image src="images/periscopecropped.svg" style="width:120px;float:left; margin-left:20px; margin-right:20px" alt="persicope">
-                <h1 style="position:absolute; margin-left:165px; margin-top:10px; font-size: 58px; text-shadow: 1px 1px 2px black;"><span style="color:white">Don't torpedo the </span"><span style="color:#bedfff ">whales!</span></h1>
+                <h1 style="position:absolute; margin-left:165px; margin-top:10px; font-size: 58px; text-shadow: 1px 1px 2px black; white-space: nowrap;"><span style="color:white">Don't torpedo the </span"><span style="color:#bedfff ">whales!</span></h1>
                 <p style="font-family: Georgia; position:absolute; margin-left:170px; margin-top:75px; font-size: 15px; color:#4e7dad"><i>(An absurd game of luck and logic)</i></p>
             </div>
             </image><div class="center">
                 <!-- Words for the game -->
                 <div class ="words">
-
                     <p><b>Objective:</b> You are a submarine captain. Your mission is to sink the 3 enemy submarines without hitting the 5 innocent whales.
                     You can't see in the murky water, but sonar numbers (1-4) show how far a target is away from each shot after it is fired.</p>
                     <p><b>Scoring:</b></p>
@@ -145,8 +143,8 @@
                         <img class="arrow" src="images/arrow.svg" style="position:absolute; top:80px; left: 160px; transform: rotate(90deg);" onClick="myGamePiece.moveRight();">
                         <img class="arrow" src="images/arrow.svg" style="position:absolute; top:160px; left: 80px; transform: rotate(180deg);" onClick="myGamePiece.moveDown();">
                         
-                        <button style="position:absolute; bottom:0px; left:0px;" onClick="myGameArea.reveal();">REVEAL</button>
-                        <button style="position:absolute; bottom:0px; left:160px;" onClick="startGame();">RESET</button>
+                        <button style="position:absolute; bottom:0px; left:0px; opacity: 0;" onClick="myGameArea.reveal();">REVEAL</button>
+                        <button style="position:absolute; bottom:0px; left:160px; opacity: 0;" onClick="startGame();">RESET</button>
                         
                         <div class="image-swap" style="position:absolute; top:82px; left:80px;" onClick="myGamePiece.reveal();">
                             <img src="images/button.svg" style="width:80px; height:80px;"/>
@@ -160,7 +158,6 @@
             </div>
             <div class="footer">
                 <!-- Footer -->
-                <p>Created by James Peacemaker Jr.</p>
             </div>
         </div>
     </body>
@@ -311,13 +308,13 @@
                             this.context.fillStyle = "black";
                             this.context.fillText(this.gameMatrix[i][j].value, i*gameSquareSize+6, j*gameSquareSize+16);
                         } else if (this.gameMatrix[i][j].value == 0){
-                            this.context.fillStyle = "white";
+                            //this.context.fillStyle = "white";
                             postImage("./images/deadsubicon.jpg", i*gameSquareSize, j*gameSquareSize);
                         } else if (this.gameMatrix[i][j].value == 9){
-                            this.context.fillStyle = "purple";
+                            //this.context.fillStyle = "purple";
                             postImage("./images/deadwhaleicon.jpg", i*gameSquareSize, j*gameSquareSize);
                         } else {
-                            this.context.fillStyle = "#bbddff";
+                            this.context.fillStyle = "#ddeeff";
                             this.context.fillRect(i*gameSquareSize, j*gameSquareSize, gameSquareSize, gameSquareSize);
                         }
                     }
@@ -742,7 +739,7 @@
     // splash screen image when all submarines have been destroyed
     function splashWin(){
         const img = new Image();        
-        img.src = './images/whaleshot.svg';        
+        img.src = './images/sky.svg';        
         img.onload = () => {          
             myGameArea.context.drawImage(img, 0, 0);
         };
