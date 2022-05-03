@@ -424,6 +424,7 @@
                     await sleep(1000).then(() => {  
                         myGameArea.render();
                     });
+                    splashSubmarine();
                     if (myTargets.targetRemaining == 0) {
                         myScore.finish();
                     }  
@@ -605,7 +606,9 @@
         
         finish : async function() {
             // show splash screen
-            winShow();
+            await sleep(3000).then(() => {  
+                winShow();
+            });
 
             // update cookie with score
 
@@ -730,7 +733,7 @@
     // submarine hit by torpedo splash screen image
     function splashSubmarine(){
         const img = new Image();        
-        img.src = './images/whaleshot.svg';        
+        img.src = './images/submarine.svg';        
         img.onload = () => {          
             myGameArea.context.drawImage(img, 0, 0);
         };
