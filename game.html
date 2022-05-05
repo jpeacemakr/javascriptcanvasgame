@@ -103,6 +103,9 @@
 
         </style>
 
+        <script src="scripts/jquery.js"></script>
+        <script src="scripts/jquery.cookie.js"></script>
+
     </head>
 
 
@@ -112,6 +115,7 @@
    
         <div id="win" class="winHide">
             <img src="images/sky.svg">
+            <button onClick="winHide(); startGame();">CLOSE</button>
         </div>
 
         <div class = "page">
@@ -143,8 +147,8 @@
                         <img class="arrow" src="images/arrow.svg" style="position:absolute; top:80px; left: 160px; transform: rotate(90deg);" onClick="myGamePiece.moveRight();">
                         <img class="arrow" src="images/arrow.svg" style="position:absolute; top:160px; left: 80px; transform: rotate(180deg);" onClick="myGamePiece.moveDown();">
                         
-                        <button style="position:absolute; bottom:0px; left:0px; opacity: 0;" onClick="myGameArea.reveal();">REVEAL</button>
-                        <button style="position:absolute; bottom:0px; left:160px; opacity: 0;" onClick="startGame();">RESET</button>
+                        <!-- <button style="position:absolute; bottom:0px; left:0px; opacity: 0;" onClick="myGameArea.reveal();">REVEAL</button>
+                        <button style="position:absolute; bottom:0px; left:160px; opacity: 0;" onClick="startGame();">RESET</button> -->
                         
                         <div class="image-swap" style="position:absolute; top:82px; left:80px;" onClick="myGamePiece.reveal();">
                             <img src="images/button.svg" style="width:80px; height:80px;"/>
@@ -162,6 +166,7 @@
         </div>
     </body>
 </html>
+
 
 
 <script>
@@ -612,13 +617,29 @@
 
             // update cookie with score
 
+            $.cookie("visits", "10");
+            console.log("cookie: " + $.cookie("visits")); // print "10"
 
-            // reset the game
-            await sleep(5000).then(() => {  
-                winHide();
-            });
-            startGame();
-
+            // set initial cookie values if cookie doesn't exist
+            if (typeof $.cookie('gamesplayed') === 'undefined'){
+                $.cookie("gamesplayed", 1);
+                $.cookie("highscore", myScore.gameScore);
+                $.cookie("lowescore", myScore.gameScore);
+                $.cookie("totalscore", myScore.gameScore);
+            } else {
+                $.cookie("gamesplayed", $.cookie("gamesplayed")+1); // increment games played
+                if (myScore.gameScore > $.cookie("highscore")){ // set new high score if higher
+                    $.cookie("highscore", myScore.gameScore);
+                }
+                if (myScore.gameScore < $.cookie("lowscore")){ // set new low score if lower
+                    $.cookie("lowscore", myScore.gameScore);
+                }
+                $.cookie("totalscore", $.cookie("totalscore")+myScore.gameScore); // add score to total score (will be used for average score)
+            }
+            console.log("gamesplayed: " + $.cookie("gamesplayed")); 
+            console.log("highscore: " + $.cookie("highscore")); 
+            console.log("lowscore: " + $.cookie("lowscore")); 
+            console.log("totalscore: " + $.cookie("totalscore")); 
         }
     }
 
@@ -643,8 +664,16 @@
             myGamePiece.moveDown();
             return true;
         } 
-        else if (event.keyCode == 66) {
+        else if (event.keyCode == 70) { // f for fire
             myGamePiece.reveal();
+            return true;
+        } 
+        else if (event.keyCode == 87) { // w for win
+            myScore.finish();
+            return true;
+        } 
+        else if (event.keyCode == 82) { // r for reveal
+            myGameArea.reveal();
             return true;
         } 
         else {
@@ -692,17 +721,17 @@
     }
 
     // sound when submarine is hit
-    function playBombAudio(){
+    function playSubAudio(){
         document.getElementById("bombAudio").play();
     }
 
     // sound when whale is hit
-    function playBombAudio(){
+    function playWhaleAudio(){
         document.getElementById("bombAudio").play();
     }
 
     // sound when game is over
-    function playBombAudio(){
+    function playWinAudio(){
         document.getElementById("bombAudio").play();
     }
     
