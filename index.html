@@ -173,6 +173,7 @@
             </div>
             <div class="footer">
                 <!-- Footer -->
+                Version 1.123
             </div>
         </div>
     </body>
@@ -630,7 +631,7 @@
             // set initial cookie values if cookie doesn't exist
             // get date for cookies to expire in one year
             cookieDate = new Date;
-            cookieDate.setTime(cookieDate.getDate() + 365);
+            cookieDate.setDate(cookieDate.getDate() + 365);
 
             if (typeof $.cookie('gamesplayed') === 'undefined'){
                 $.cookie("gamesplayed", 1, { expires: cookieDate });
@@ -658,7 +659,7 @@
             "<p>Games played: " + $.cookie("gamesplayed") + "<br>" +
             "Highest score: " + $.cookie("highscore") + "<br>" +
             "Lowest score: " + $.cookie("lowscore") + "<br>" +
-            "Average score: " + (parseInt($.cookie("totalscore"))/parseInt($.cookie("gamesplayed"))) + "</p>" 
+            "Average score: " + Math.round(parseInt($.cookie("totalscore"))/parseInt($.cookie("gamesplayed"))) + "</p>" 
             ;
         }
     }
